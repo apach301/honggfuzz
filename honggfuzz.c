@@ -265,13 +265,13 @@ static uint8_t mainThreadLoop(honggfuzz_t* hfuzz) {
     setupSignalsMainThread();
     setupMainThreadTimer();
 
-    uint64_t dynamicQueuePollTime = time(NULL);
+    //uint64_t dynamicQueuePollTime = time(NULL);
     for (;;) {
-         if (hfuzz->io.dynamicInputDir &&
-                time(NULL) - dynamicQueuePollTime > _HF_SYNC_TIME) {
+         if (hfuzz->io.dynamicInputDir) { //&&
+                //time(NULL) - dynamicQueuePollTime > _HF_SYNC_TIME) {
             LOG_D("Loading files from the dynamic input queue...");
             input_enqueueDynamicInputs(hfuzz);
-            dynamicQueuePollTime = time(NULL);
+            //dynamicQueuePollTime = time(NULL);
         }
 
         if (hfuzz->display.useScreen) {
