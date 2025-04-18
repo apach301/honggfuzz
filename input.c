@@ -695,7 +695,8 @@ void input_enqueueDynamicInputs(honggfuzz_t* hfuzz) {
             .timeExecUSecs = 1,
             .path          = "",
             .timedout      = false,
-            .imported      = true,
+            //.imported      = true,
+            .imported      = false,
             .data          = dynamicFile,
         };
         tmp_run.timeStartedUSecs = util_timeNowUSecs() - 1;
