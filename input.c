@@ -390,6 +390,12 @@ void input_addDynamicInput(run_t* run) {
 
     dynfile->idx = ATOMIC_PRE_INC(run->global->io.dynfileqCnt);
 
+    //if (dynfile->imported) {
+    //    LOG_I("==input_addDynamicInput==: ADDING IMPORTED INPUT idx=%zu, cov=[%zu, %zu, %zu, %zu]", dynfile->idx, dynfile->cov[0], dynfile->cov[1], dynfile->cov[2], dynfile->cov[3]);
+    //} else {
+    //    LOG_I("==input_addDynamicInput==: Adding non-imported input idx=%zu, cov=[%zu, %zu, %zu, %zu]", dynfile->idx, dynfile->cov[0], dynfile->cov[1], dynfile->cov[2], dynfile->cov[3]);
+    //}
+
     run->global->feedback.maxCov[0] = HF_MAX(run->global->feedback.maxCov[0], dynfile->cov[0]);
     run->global->feedback.maxCov[1] = HF_MAX(run->global->feedback.maxCov[1], dynfile->cov[1]);
     run->global->feedback.maxCov[2] = HF_MAX(run->global->feedback.maxCov[2], dynfile->cov[2]);
@@ -536,6 +542,10 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     if (ATOMIC_GET(run->global->io.dynfileqCnt) == 0) {
         LOG_F("The dynamic file corpus is empty. This shouldn't happen");
     }
+    //if (run->current != NULL) {
+    //   LOG_I("====input_prepareDynamicInput()====: triesLeft=%d; current mangling idx=%zu", run->triesLeft, run->current->idx);
+    //}
+
 
     for (;;) {
         MX_SCOPED_RWLOCK_WRITE(&run->global->mutex.dynfileq);
@@ -551,9 +561,11 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
 
         run->current                    = run->global->io.dynfileqCurrent;
         run->global->io.dynfileqCurrent = TAILQ_NEXT(run->global->io.dynfileqCurrent, pointers);
+        //LOG_I("    selected current idx=%zu, imported=%d", run->current->idx, run->current->imported);
 
         /* Do not count skip_factor on unmeasured (imported) inputs */
         if (run->current->imported) {
+            //LOG_I("    current is imported, idx=%zu not count skipFactor", run->current->idx);
             break;
         }
 
@@ -585,9 +597,11 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
        to dynamic queue again in case of profit.
     */
     if (run->current->imported) {
-        TAILQ_REMOVE(&run->global->io.dynfileq, run->current, pointers);
-        ATOMIC_POST_DEC(run->global->io.newUnitsAdded);
-        run->triesLeft = 0;
+        //LOG_I("    current input is imported, return without mutations");
+        //TAILQ_REMOVE(&run->global->io.dynfileq, run->current, pointers);
+        //ATOMIC_POST_DEC(run->global->io.newUnitsAdded);
+        //run->triesLeft = 0;
+        run->current->imported = false;
         return true;
     }
 
@@ -695,8 +709,7 @@ void input_enqueueDynamicInputs(honggfuzz_t* hfuzz) {
             .timeExecUSecs = 1,
             .path          = "",
             .timedout      = false,
-            //.imported      = true,
-            .imported      = false,
+            .imported      = true,
             .data          = dynamicFile,
         };
         tmp_run.timeStartedUSecs = util_timeNowUSecs() - 1;

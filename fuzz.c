@@ -281,10 +281,15 @@ static void fuzz_perfFeedback(run_t* run) {
 
         /* Push useful imported input to dynamic queue again for the further mutations */
         if (run->dynfile->imported) {
+            //LOG_I("====fuzz_perfFeedback()====: NEW COVERAGE on idx=%zu, cov=[%zu, %zu, %zu, %zu]\n", run->dynfile->idx, run->dynfile->cov[0], run->dynfile->cov[1],
+            //    run->dynfile->cov[2], run->dynfile->cov[3]);
+            //LOG_I("   it was imported file! triesLeft is %d but set it to 10", run->triesLeft);
             LOG_I("File imported: %s", run->dynfile->path);
             run->dynfile->imported = false;
+            run->triesLeft = 10;
+        } else {
+            input_addDynamicInput(run);
         }
-        input_addDynamicInput(run);
 
         if (run->global->socketFuzzer.enabled) {
             LOG_D("SocketFuzzer: fuzz: new BB (perf)");
@@ -293,11 +298,14 @@ static void fuzz_perfFeedback(run_t* run) {
     } else if (run->dynfile->imported) {
         /* Remove useless imported inputs from corpus */
         LOG_D("Removing useless imported file: %s", run->dynfile->path);
-        char fname[PATH_MAX];
-        snprintf(fname, PATH_MAX, "%s/%s",
-                run->global->io.outputDir ? run->global->io.outputDir : run->global->io.inputDir,
-                run->dynfile->path);
-        unlink(fname);
+        //LOG_I("====fuzz_perfFeedback()=====: UNUSED IMPORTED: idx=%zu, cov=[%zu, %zu, %zu, %zu], tries=%d", run->dynfile->idx, run->dynfile->cov[0], run->dynfile->cov[1],
+        //        run->dynfile->cov[2], run->dynfile->cov[3], run->triesLeft);
+        run->triesLeft = 0;
+        //char fname[PATH_MAX];
+        //snprintf(fname, PATH_MAX, "%s/%s",
+        //        run->global->io.outputDir ? run->global->io.outputDir : run->global->io.inputDir,
+        //        run->dynfile->path);
+        //unlink(fname);
     }
 }
 
