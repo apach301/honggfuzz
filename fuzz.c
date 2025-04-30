@@ -286,7 +286,7 @@ static void fuzz_perfFeedback(run_t* run) {
             //LOG_I("   it was imported file! triesLeft is %d but set it to 10", run->triesLeft);
             LOG_I("File imported: %s", run->dynfile->path);
             run->dynfile->imported = false;
-            run->triesLeft = 10;
+            run->triesLeft = 2;
         } else {
             input_addDynamicInput(run);
         }
@@ -295,18 +295,13 @@ static void fuzz_perfFeedback(run_t* run) {
             LOG_D("SocketFuzzer: fuzz: new BB (perf)");
             fuzz_notifySocketFuzzerNewCov(run->global);
         }
-    } else if (run->dynfile->imported) {
+    }// else if (run->dynfile->imported) {
         /* Remove useless imported inputs from corpus */
-        LOG_D("Removing useless imported file: %s", run->dynfile->path);
+        //LOG_D("Removing useless imported file: %s", run->dynfile->path);
         //LOG_I("====fuzz_perfFeedback()=====: UNUSED IMPORTED: idx=%zu, cov=[%zu, %zu, %zu, %zu], tries=%d", run->dynfile->idx, run->dynfile->cov[0], run->dynfile->cov[1],
         //        run->dynfile->cov[2], run->dynfile->cov[3], run->triesLeft);
-        run->triesLeft = 0;
-        //char fname[PATH_MAX];
-        //snprintf(fname, PATH_MAX, "%s/%s",
-        //        run->global->io.outputDir ? run->global->io.outputDir : run->global->io.inputDir,
-        //        run->dynfile->path);
-        //unlink(fname);
-    }
+    //    run->triesLeft = 0;
+    //}
 }
 
 /* Return value indicates whether report file should be updated with the current verified crash */
