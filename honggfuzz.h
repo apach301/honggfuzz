@@ -156,6 +156,7 @@ struct _dynfile_t {
     fuzzState_t        phase;
     bool               timedout;
     uint8_t*           data;
+    bool               imported;
     TAILQ_ENTRY(_dynfile_t) pointers;
 };
 

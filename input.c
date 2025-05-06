@@ -377,6 +377,7 @@ void input_addDynamicInput(run_t* run) {
     dynfile->timeExecUSecs = util_timeNowUSecs() - run->timeStartedUSecs;
     dynfile->data          = (uint8_t*)util_AllocCopy(run->dynfile->data, run->dynfile->size);
     dynfile->src           = run->dynfile->src;
+    dynfile->imported      = run->dynfile->imported;
     memcpy(dynfile->cov, run->dynfile->cov, sizeof(dynfile->cov));
     if (run->dynfile->src) {
         ATOMIC_POST_INC(run->dynfile->src->refs);
@@ -569,6 +570,7 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     run->dynfile->refs          = 0;
     run->dynfile->phase         = fuzz_getState(run->global);
     run->dynfile->timedout      = run->current->timedout;
+    run->dynfile->imported      = run->current->imported;
     memcpy(run->dynfile->cov, run->current->cov, sizeof(run->dynfile->cov));
     snprintf(run->dynfile->path, sizeof(run->dynfile->path), "%s", run->current->path);
     memcpy(run->dynfile->data, run->current->data, run->current->size);
@@ -677,6 +679,7 @@ void input_enqueueDynamicInputs(honggfuzz_t* hfuzz) {
             .timeExecUSecs = 1,
             .path          = "",
             .timedout      = false,
+            .imported      = true,
             .data          = dynamicFile,
         };
         tmp_run.timeStartedUSecs = util_timeNowUSecs() - 1;
