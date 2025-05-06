@@ -377,7 +377,7 @@ void input_addDynamicInput(run_t* run) {
     dynfile->timeExecUSecs = util_timeNowUSecs() - run->timeStartedUSecs;
     dynfile->data          = (uint8_t*)util_AllocCopy(run->dynfile->data, run->dynfile->size);
     dynfile->src           = run->dynfile->src;
-    dynfile->imported      = run->dynfile->imported,
+    dynfile->imported      = run->dynfile->imported;
     memcpy(dynfile->cov, run->dynfile->cov, sizeof(dynfile->cov));
     if (run->dynfile->src) {
         ATOMIC_POST_INC(run->dynfile->src->refs);
@@ -389,12 +389,6 @@ void input_addDynamicInput(run_t* run) {
     MX_SCOPED_RWLOCK_WRITE(&run->global->mutex.dynfileq);
 
     dynfile->idx = ATOMIC_PRE_INC(run->global->io.dynfileqCnt);
-
-    //if (dynfile->imported) {
-    //    LOG_I("==input_addDynamicInput==: ADDING IMPORTED INPUT idx=%zu, cov=[%zu, %zu, %zu, %zu]", dynfile->idx, dynfile->cov[0], dynfile->cov[1], dynfile->cov[2], dynfile->cov[3]);
-    //} else {
-    //    LOG_I("==input_addDynamicInput==: Adding non-imported input idx=%zu, cov=[%zu, %zu, %zu, %zu]", dynfile->idx, dynfile->cov[0], dynfile->cov[1], dynfile->cov[2], dynfile->cov[3]);
-    //}
 
     run->global->feedback.maxCov[0] = HF_MAX(run->global->feedback.maxCov[0], dynfile->cov[0]);
     run->global->feedback.maxCov[1] = HF_MAX(run->global->feedback.maxCov[1], dynfile->cov[1]);
@@ -542,10 +536,6 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     if (ATOMIC_GET(run->global->io.dynfileqCnt) == 0) {
         LOG_F("The dynamic file corpus is empty. This shouldn't happen");
     }
-    //if (run->current != NULL) {
-    //   LOG_I("====input_prepareDynamicInput()====: triesLeft=%d; current mangling idx=%zu", run->triesLeft, run->current->idx);
-    //}
-
 
     for (;;) {
         MX_SCOPED_RWLOCK_WRITE(&run->global->mutex.dynfileq);
@@ -561,11 +551,9 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
 
         run->current                    = run->global->io.dynfileqCurrent;
         run->global->io.dynfileqCurrent = TAILQ_NEXT(run->global->io.dynfileqCurrent, pointers);
-        //LOG_I("    selected current idx=%zu, imported=%d", run->current->idx, run->current->imported);
 
         /* Do not count skip_factor on unmeasured (imported) inputs */
         if (run->current->imported) {
-            //LOG_I("    current is imported, idx=%zu not count skipFactor", run->current->idx);
             break;
         }
 
@@ -593,14 +581,8 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     snprintf(run->dynfile->path, sizeof(run->dynfile->path), "%s", run->current->path);
     memcpy(run->dynfile->data, run->current->data, run->current->size);
 
-    /* Run unmangled imported input to measure coverage. It would be added
-       to dynamic queue again in case of profit.
-    */
+    /* Run unmangled imported input to measure coverage. */
     if (run->current->imported) {
-        //LOG_I("    current input is imported, return without mutations");
-        //TAILQ_REMOVE(&run->global->io.dynfileq, run->current, pointers);
-        //ATOMIC_POST_DEC(run->global->io.newUnitsAdded);
-        //run->triesLeft = 0;
         run->current->imported = false;
         return true;
     }
