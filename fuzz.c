@@ -278,6 +278,10 @@ static void fuzz_perfFeedback(run_t* run) {
         run->dynfile->cov[1] = softCurCmp;
         run->dynfile->cov[2] = run->hwCnts.cpuInstrCnt + run->hwCnts.cpuBranchCnt;
         run->dynfile->cov[3] = run->dynfile->size ? (64 - util_Log2(run->dynfile->size)) : 64;
+        if (run->dynfile->imported) {
+            LOG_D("File imported: %s", run->dynfile->path);
+            run->dynfile->imported = false;
+        }
         input_addDynamicInput(run);
 
         if (run->global->socketFuzzer.enabled) {

@@ -575,6 +575,10 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     snprintf(run->dynfile->path, sizeof(run->dynfile->path), "%s", run->current->path);
     memcpy(run->dynfile->data, run->current->data, run->current->size);
 
+    if (run->current->imported) {
+        run->current->imported = false;
+    }
+
     if (needs_mangle) {
         mangle_mangleContent(run);
     }
