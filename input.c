@@ -552,11 +552,6 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
         run->current                    = run->global->io.dynfileqCurrent;
         run->global->io.dynfileqCurrent = TAILQ_NEXT(run->global->io.dynfileqCurrent, pointers);
 
-        /* Do not count skip_factor on unmeasured (imported) inputs */
-        if (run->current->imported) {
-            break;
-        }
-
         int skip_factor = input_skipFactor(run, run->current);
 
         if (skip_factor <= 0) {
@@ -584,7 +579,6 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     /* Run unmangled imported input to measure coverage. */
     if (run->current->imported) {
         run->current->imported = false;
-        return true;
     }
 
     if (needs_mangle) {

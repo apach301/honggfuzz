@@ -282,10 +282,8 @@ static void fuzz_perfFeedback(run_t* run) {
         if (run->dynfile->imported) {
             LOG_D("File imported: %s", run->dynfile->path);
             run->dynfile->imported = false;
-            run->triesLeft = 0;
-        } else {
-            input_addDynamicInput(run);
         }
+        input_addDynamicInput(run);
 
         if (run->global->socketFuzzer.enabled) {
             LOG_D("SocketFuzzer: fuzz: new BB (perf)");
