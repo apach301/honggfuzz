@@ -579,6 +579,7 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
     /* Run unmangled imported input to measure coverage. */
     if (run->current->imported) {
         run->current->imported = false;
+        return true;
     }
 
     if (needs_mangle) {
