@@ -553,7 +553,6 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
         run->global->io.dynfileqCurrent = TAILQ_NEXT(run->global->io.dynfileqCurrent, pointers);
 
         int skip_factor = input_skipFactor(run, run->current);
-
         if (skip_factor <= 0) {
             run->triesLeft = -(skip_factor);
             break;
