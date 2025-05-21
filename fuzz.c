@@ -282,6 +282,7 @@ static void fuzz_perfFeedback(run_t* run) {
         if (run->dynfile->imported) {
             LOG_D("File imported: %s", run->dynfile->path);
             run->dynfile->imported = false;
+            run->triesLeft = 1;
         } else {
             input_addDynamicInput(run);
         }
