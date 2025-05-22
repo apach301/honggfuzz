@@ -577,6 +577,8 @@ bool input_prepareDynamicInput(run_t* run, bool needs_mangle) {
 
     /* Run unmangled imported input to measure coverage. */
     if (run->current->imported) {
+        TAILQ_REMOVE(&run->global->io.dynfileq, run->current, pointers);
+        ATOMIC_POST_DEC(run->global->io.newUnitsAdded);
         run->current->imported = false;
         return true;
     }
